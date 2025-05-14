@@ -1,0 +1,65 @@
+name: Build Ren'Py iOS App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Ren'Py
+      - name: Set up Ren'Py
+        uses: remarkablegames/setup-renpy@v1
+        with:
+          version: '8.1.1'  # Specify the desired Ren'Py version
+
+      # Step 3: Download and install Ren'iOS
+      - name: Download and install Ren'iOS
+        run: |
+          curl -L https://www.renpy.org/dl/renios/renios-8.1.1.zip -o renios.zip
+          unzip renios.zip -d $HOME/renpy/renios
+        env:
+          RENPY_PATH: $HOME/renpy  # Adjust based on setup-renpy output
+
+      # Step 4: Create script to generate Xcode project
+      - name: Create Ren'Py script for Xcode project
+        run: |
+          cat << 'EOF' > create_ios.rpy
+          init python:
+              from renpy.project import Project
+              p = Project("${{ github.workspace }}/game")  # Path to your Ren'Py game directory
+              from launcher.game.ios import ios_create
+              ios_create(p, gui=False, target="${{ github.workspace }}/ios-build")
+          EOF
+
+      # Step 5: Generate Xcode project
+      - name: Generate Xcode project
+        run: |
+          $HOME/renpy/renpy.sh $HOME/renpy/launcher --script ${{ github.workspace }}/create_ios.rpy
+
+      # Step 6: Build iOS app
+      - name: Build iOS app
+        uses: yukiarrr/ios-build-action@v1.12.0
+        with:
+          project-path: ${{ github.workspace }}/ios-build/yourgame.xcodeproj  # Adjust based on output
+          scheme: 'yourgame'  # Replace with your game's scheme name
+          configuration: 'Release'
+          export-method: 'app-store'  # Options: app-store, ad-hoc, development, etc.
+          certificate-uri: ${{ secrets.CERTIFICATE_URI }}  # Store in GitHub Secrets
+          certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
+          provisioning-profile: ${{ secrets.PROVISIONING_PROFILE }}
+          team-id: ${{ secrets.TEAM_ID }}
+
+      # Optional: Upload the .ipa file as an artifact
+      - name: Upload iPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: iOS-App
+          path: '*.ipa'
