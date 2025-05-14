@@ -1,23 +1,21 @@
-name: Ren'Py CLI
-on: push
+name: Build RenPy
+
+on:
+  push:
+
 jobs:
-  renpy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Setup Ren'Py
-        uses: remarkablegames/setup-renpy@v1
-
-      - name: Get version
-        run: renpy-cli --version
-
-      - name: See help
-        run: renpy-cli --help
-
-      - name: Set projects directory
-        run: renpy-launcher set_projects_directory ..
-      - name: IOS 
-        uses: remarkablegames/setup-renpy@v1
-        with:
-          renios: true
-      - uses: remarkablegames/setup-renpy@v1
-      - run: renpy-launcher
+    - uses: actions/checkout@v4
+    - name: Install RenPy
+      uses: PaxlavaGames/renpy-install@v0.3.0
+      with:
+        version: "8.2.0"
+    - name: Build RenPy
+      uses: PaxlavaGames/renpy-build@v0.3.0
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: game-build
+        path: './build'
