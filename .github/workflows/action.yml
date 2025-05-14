@@ -19,3 +19,5 @@ jobs:
         uses: remarkablegames/setup-renpy@v1
         with:
           renios: true
+      - uses: remarkablegames/setup-renpy@v1
+      - run: renpy-launcher
