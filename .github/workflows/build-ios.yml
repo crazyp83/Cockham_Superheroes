@@ -59,7 +59,7 @@ jobs:
 
       # Optional: Upload the .ipa file as an artifact
       - name: Upload iPA
-        uses: actions/upload-artifact
+        uses: actions/upload-artifact@v4
         with:
           name: iOS-App
           path: '*.ipa'
