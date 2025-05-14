@@ -23,7 +23,7 @@ jobs:
       # Step 3: Download and install Ren'iOS
       - name: Download and install Ren'iOS
         run: |
-          curl -L https://www.renpy.org/dl/renios/renios-8.1.1.zip -o renios.zip
+          curl -L https://www.renpy.org/dl/8.3.7/renpy-8.3.7-renios.zip -o renios.zip
           unzip renios.zip -d $HOME/renpy/renios
         env:
           RENPY_PATH: $HOME/renpy  # Adjust based on setup-renpy output
