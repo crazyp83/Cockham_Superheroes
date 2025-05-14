@@ -1,4 +1,4 @@
-name: Build Ren'Py iOS App test 1
+name: Build Ren'Py iOS App test 5
 
 on:
   workflow_dispatch:
@@ -35,3 +35,23 @@ jobs:
         cd renpy/renpy-8.3.7-sdk
         ./renpy.sh launcher ios_create $GITHUB_WORKSPACE ios
         ./renpy.sh launcher ios_populate $GITHUB_WORKSPACE ios
+ 
+
+# Create a GitHub release using the provided access token
+    - name: Create GitHub release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      with:
+        tag_name: v${{ github.run_number }}
+        release_name: Release v${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+      # Upload the IPA file as a release asset
+    - name: Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref_type == 'tag'
+        with:
+          files: CockhamSuperheros.ipa
