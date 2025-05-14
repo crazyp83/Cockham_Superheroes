@@ -1,0 +1,10 @@
+﻿I'm sorry, but errors were detected in your script. Please correct the
+errors listed below, and try again.
+
+
+File "game/images/gallery/gallerylois.rpy", line 708: end of line expected.
+    lp "Please sit down on the sofa Master, and I will demonstrate to you how I will dilate my fuckholes with it."window hide
+                                                                                                                  ^
+
+Ren'Py Version: Ren'Py 7.2.0.424
+Fri Nov 24 07:30:42 2023

@@ -1,0 +1,1014 @@
+label KeenGallery:
+stop channel3
+play channel3 "sounds/barmusic.mp3"
+scene keenbackground
+show keenmaingallery at gallerypos01 with moveinleft
+call screen gallerykeen()
+screen gallerykeen():
+    text "{font=Gui/Heroes Legend.ttf}Naughty Barbara Keen{/font}" color "#FF0000" size 50 outlines [(3, "#fff4", 0, 0), (3, "#fff8", 0, 0),  (2, "#fffc", 0, 0)] at gallerytoptext02
+    add "icons/returnicon.png"
+    button:
+        focus_mask True
+        button:
+            xpos 1730
+            ypos 1020
+            xysize(145, 40)
+            action [Hide ("gallerykeen"), Jump ("MainGallery02")]
+    add "gallery/animidle.png" xpos 35 ypos 1010
+    text "{font=Gui/Heroes Legend.ttf}Animation{/font}" color "#FF0000" size 25 outlines [(2, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at galleryanimpos
+    button:
+            xpos 35
+            ypos 1010
+            xysize(300, 60)
+            action [Hide ("gallerykeen"), Jump ("KeenGalleryAnim")]
+   
+    if renpy.seen_image("barbarastrip01"):
+        imagebutton:
+            focus_mask True
+            idle "gallery/keengallery01.png" xpos 400 ypos 100
+            hover "gallery/keengallery01.png"
+            action Jump ("KeenGallery01")
+    text "{font=Gui/Heroes Legend.ttf}Strip Pole Dancing{/font}" color "#FF0000" size 20 outlines [(2, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at gallerytext01
+    if renpy.seen_image("barbarastrip01") == False:
+        imagebutton:
+            focus_mask True
+            idle "gallery/gallerylocked.png" xpos 400 ypos 100
+            hover "gallery/gallerylocked.png"
+            action Jump ("KeenGallery")
+
+    if renpy.seen_image("sirensbackroom01"):
+        imagebutton:
+            focus_mask True
+            idle "gallery/keengallery02.png" xpos 750 ypos 100
+            hover "gallery/keengallery02.png"
+            action Jump ("KeenGallery02")
+    text "{font=Gui/Heroes Legend.ttf}Back Room Threesome{/font}" color "#FF0000" size 20 outlines [(2, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at gallerytext02
+    if renpy.seen_image("sirensbackroom01") == False:
+        imagebutton:
+            focus_mask True
+            idle "gallery/gallerylocked.png" xpos 750 ypos 100
+            hover "gallery/gallerylocked.png"
+            action Jump ("KeenGallery")
+
+label KeenGalleryAnim:
+call screen screenanimbarb()
+screen screenanimbarb():
+    modal True
+    add "gallery/keenbackground.jpg"
+    add "icons/backicon.png" at posbackicon
+    if animcount == 1:
+        add "barbanimcos" xalign -0.1 yalign 1.0
+    if animcount == 2:
+        add "barbanimlin" xalign -0.1 yalign 1.0
+    if animcount == 3:
+        add "barbanimnak" xalign -0.1 yalign 1.0
+    button:
+        xpos 1730
+        ypos 1020
+        xysize(120, 50)        
+        action [renpy.hide_screen("screenanimbarb"), SetVariable ("animcount", 1), Jump ("KeenGallery")]
+    text "{font=Gui/Heroes Legend.ttf}      Barbara Keen{/font}" color "#FF0000" size 50 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosHero01
+    text "{font=Gui/Heroes Legend.ttf}Age: 32{/font}" color "#FF0000" size 22 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosAge01
+    text "{font=Gui/Heroes Legend.ttf}Height:5ft3{/font}" color "#FF0000" size 25 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosHeight01
+    text "{font=Gui/Heroes Legend.ttf}30C-21-31{/font}" color "#FF0000" size 25 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosMeasurements
+    text "{font=Gui/Heroes Legend.ttf}Sexual Kinks{/font}" color "#FF0000" size 30 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosKink
+    text "{font=Gui/Heroes Legend.ttf}Female Domination{/font}" color "#FF0000" size 30 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosKink01
+    text "{font=Gui/Heroes Legend.ttf}Doggy{/font}" color "#FF0000" size 30 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosKink02
+    text "{font=Gui/Heroes Legend.ttf}BDSM{/font}" color "#FF0000" size 30 outlines [(3, "#fff4", 0, 0), (2, "#fff8", 0, 0),  (1, "#fffc", 0, 0)] at PosKink03
+    add "gallery/barbanim01.png" xpos 1100 ypos 800
+    button:
+        xpos 1100
+        ypos 800
+        xysize(100, 100)        
+        action [SetVariable ("animcount", 1), Show ("screenanimbarb")]
+    add "gallery/barbanim02.png" xpos 1220 ypos 800
+    button:
+        xpos 1220
+        ypos 800
+        xysize(100, 100)        
+        action [SetVariable ("animcount", 2), Show ("screenanimbarb")]
+    add "gallery/barbanim03.png" xpos 1340 ypos 800
+    button:
+        xpos 1340
+        ypos 800
+        xysize(100, 100)        
+        action [SetVariable ("animcount", 3), Show ("screenanimbarb")]
+            
+label KeenGallery01:
+stop channel3
+play music "sounds/sexy07.mp3"
+scene barbarastrip01 with dissolve
+mc "* Damn... Hot strip just for ME! *"
+scene barbarastrip02 with dissolve
+$ renpy.pause(1.0, hard='True')
+bk "My club is all about ELEGANCE and CLASS."
+scene barbarastrip03 with dissolve
+mc "I see..."
+scene barbarastrip04 with dissolve
+$ renpy.pause(2.0, hard='True')
+bk "Nothing you will see here is ILLEGAL..."
+scene barbarastrip05 with dissolve
+mc "Let me be the judge of that. Carry on."
+scene barbarastrip06:
+    subpixel True
+    ease 6.0 xoffset 0 yoffset -1320
+with dissolve
+$ renpy.pause(5.0, hard='True')
+bk "This part of my strip routine is usually when heads start to turn..."
+scene barbarastrip07 with dissolve
+$ renpy.pause(2.0, hard='True')
+mc "I can see why..."
+scene barbarastrip08 with dissolve
+$ renpy.pause(1.0, hard='True')
+bk "So, are you convinced that there nothing but CLASSY, SEXY stripping going on in my establishment, [hero]?"
+mc "I suppose. But I'll come back one day when you're least expecting me, just to check..."
+stop music
+jump KeenGallery
+
+label KeenGallery02:
+stop channel3
+stop music
+scene sirensbackroombackground
+show tabithalingerie01 at midright
+with fade
+show keenlingerie01 at midleft with moveinleft
+bk "Now let's see if that outfit fits you..."
+hide tabithalingerie01
+show tabithalingerie02 at midright
+with fastdissolve
+ta "It clearly doesn't, even though I gave him the one with the LARGEST pouch size available..."
+hide keenlingerie01
+show keenlingerie02 at midleft 
+with fastdissolve
+bk "Ooh, INTERESTING. Our clientele are going to LIKE this a LOT..."
+hide keenlingerie02
+show keenlingerie03 at midleft 
+hide tabithalingerie02
+show tabithalingerie01 at midright
+with fastdissolve
+bk "Now step on the stage and show us the goods, [hero]..."
+play music "sounds/sexy06.mp3"
+scene sirensbackroom01 with dissolve
+mc "This is super-embarrassing. My cock is literally hanging out..."
+bk "Never mind that. Take a bow, we're your audience."
+scene sirensbackroom02 with dissolve
+ta "He's a natural."
+mc "And next?"
+bk "Improvise. We need to get aroused by your routine..."
+scene sirensbackroom03 with dissolve
+ta "Keep smiling. Our female clientele want to feel appreciated."
+bk "And use that pole. It's there for a reason."
+scene sirensbackroom04 with dissolve
+mc "Err, hi ladies, welcome to my SEXY show!"
+ta "Now we're talking."
+scene sirensbackroom05 with dissolve
+ta "His cock is flying everywhere! * giggles *"
+scene sirensbackroom06 with dissolve
+$ renpy.pause(1.0, hard='True')
+bk "And look at it hanging all the way to the ground... It does look YUMMY!"
+scene sirensbackroom07 with dissolve
+ta "Maybe we should test-ride it first then? What do you think, Barbara?"
+bk "I think I haven't had a cock in a long time... TOO LONG!"
+ta "That's cos you've been too busy with my PUSSY! * giggles *"
+bk "GET HARD FOR US, BOY!"
+scene sirensbackroom08 with dissolve
+$ renpy.pause(1.0, hard='True')
+ta "I'm definitely test-riding THAT THING!"
+scene sirensbackroom09 with dissolve
+mc "I feel like a cheap piece of meat."
+bk "That's what you are. At our clientele's disposal. And therefore at OUR disposal too."
+mc "I get it. I want the job badly so I'll do as I'm told. Plus, I'm just too horny right now."
+stop music fadeout 2.0
+bk "Your routine was quite good. But it could be better. Why don't you stand next to me while Tabitha shows you how to perform a PROPER pole dance routine?..."
+play music "sounds/sexy11.mp3"
+scene sirensbackroom10:
+    subpixel True
+    xpos 0.0
+    linear 3.0 xpos -0.1
+with dissolve
+$ renpy.pause(2.0, hard='True')
+bk "Watch her. And learn from her. Then, you'll be ready to be a gigolo waiter at my big party..."
+mc "Su.. Sure..."
+scene sirensbackroom11 with dissolve
+$ renpy.pause(1.0, hard='True')
+ta "I feel a HORNY audience tonight..."
+scene sirensbackroom12 with dissolve
+$ renpy.pause(1.0, hard='True')
+ta "HORNY for a HOT, SENSUAL, show..."
+bk "See how she engages with her audience?"
+scene sirensbackroom13 with dissolve
+$ renpy.pause(1.0, hard='True')
+mc "Damn, look at that backside!"
+bk "She's making you even HARDER, isn't she? I can feel your dong GROWING, [hero]..."
+scene sirensbackroom14 with dissolve
+$ renpy.pause(1.0, hard='True')
+ta "I'm HORNY too..."
+scene sirensbackroom15 with dissolve
+$ renpy.pause(1.0, hard='True')
+bk "And look at how agile she is..."
+scene sirensbackroom16 with dissolve
+mc "Oh fuck..."
+scene sirensbackroom17 with dissolve
+bk "Yeah, watch her slide down that pole while my hand slides up YOURS!"
+scene sirensbackroom18:
+    subpixel True
+    xpos 0.0
+    linear 3.0 xpos -0.1
+with dissolve
+$ renpy.pause(2.0, hard='True')
+bk "Watch what she's about to do..."
+scene sirensbackroom19 with dissolve
+$ renpy.pause(1.0, hard='True')
+ta "...for the final touch!"
+mc "Oh!!!"
+scene sirensbackroom20 with dissolve
+$ renpy.pause(1.0, hard='True')
+bk "And now the Grand Finale! What did you think?"
+mc "Spectacular!"
+stop music
+ta "You ain't seen nothing yet, [hero]... Barbara, why don't you join me on stage?"
+scene sirensbackroom21 with dissolve
+play music "sounds/sexy13.mp3"
+bk "I thought you'd never ask. Let me take my top off..."
+scene sirensbackroom22 with dissolve
+ta "Your breast are so soft... I never tire of playing with them!"
+scene sirensbackroom23 with dissolve
+play sound "sounds/moan02.mp3"
+bk "And I LOVE how you play so delicately with them too..."
+scene sirensbackroom24 with dissolve
+ta "There's something else soft and tender that I'd like to play with..."
+scene sirensbackroom25 with dissolve
+play sound "sounds/moan02.mp3"
+bk "Mmmh... In front of this... young muscle stud... You're going to make him so jealous..."
+scene sirensbackroom26 with dissolve
+mc "You girls are making me so FUCKING HORNY!"
+scene sirensbackroom27 with dissolve
+bk "Then come and join us..."
+mc "FUCK YEAH!"
+scene sirensbackroom28 with dissolve
+ta "I'm going to lick that sumptuous pussy."
+scene sirensbackroom29 with dissolve
+mc "While I finger your sumptuous PUSSY!"
+play sound "sounds/moan01.mp3"
+ta "Oooh, that's so NAUGHTY!"
+scene sirensbackroom30 with dissolve
+play channel2 "sounds/lick01.ogg"
+bk "Oooh... That's so..."
+scene sirensbackroom31 with dissolve
+play sound "sounds/moan03.mp3"
+bk "...GOOOD!"
+scene sirensbackroom30 with fastdissolve
+play channel1 "sounds/moan02.mp3"
+$ renpy.pause(0.5, hard='True')
+scene sirensbackroom31 with fastdissolve
+$ renpy.pause(1.0, hard='True')
+scene sirensbackroom30 with fastdissolve
+$ renpy.pause(0.5, hard='True')
+scene sirensbackroom31 with fastdissolve
+$ renpy.pause(1.0, hard='True')
+scene sirensbackroom30 with fastdissolve
+$ renpy.pause(0.5, hard='True')
+scene sirensbackroom31 with fastdissolve
+$ renpy.pause(1.0, hard='True')
+stop channel1
+stop channel2
+ta "That was real Tasty, Barbara..."
+bk "I... NEED A COCK! Carry us to the fuck area, [hero]..."
+stop music
+scene sirensbackroom32 with fastdissolve
+bk "Oh my, you really are STRONG!"
+if mcstrength == 1:
+    mc "Super-Strength Level 1 right there, ladies!"
+if mcstrength == 2:
+    mc "Super-Strength Level 2 right there, ladies!"
+    ta "Level 2? Wow, almost as strong as SUPERMAN!"
+
+scene sirensbackroom33 with fastdissolve
+bk "So what are you going to do, Super-Strong Boy?"
+mc "I'm going to stick my giant pud up your twat so far, you'll be able to TASTE IT!"
+bk "Let' see if you can keep promises then..."
+scene sirensbackroom34 with dissolve
+play sound "sounds/moan05.mp3"
+bk "OOOOH! It's... * panting * ...already QUITE deep... Just go slow at first..."
+
+label SirensBarbShortFuckSlowx:
+$ barbharderx = False
+window hide
+show sirensbarbshortslowvideo behind sirensbarbshortfastvideo
+show sirensbarbshortslowvideo behind sirensbarbshortpovslowvideo
+show sirensbarbshortslowvideo behind sirensbarbslowvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex01.mp3"
+hide sirensbarbshortfastvideo
+hide sirensbarbshortpovslowvideo
+hide sirensbarbslowvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+show harder:
+    xpos 1700 ypos 700    
+show faster:
+     xpos 1700 ypos 500     
+show pov:
+     xpos 50 ypos 500     
+call screen sirensbarbshortslowx()
+screen sirensbarbshortslowx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbShortFuckFastx")
+    button:
+        xpos 1700
+        ypos 700
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckSlowx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckPOVSlowx")
+
+label SirensBarbShortFuckFastx:
+$ barbharderx = False
+window hide
+show sirensbarbshortfastvideo behind sirensbarbshortslowvideo
+show sirensbarbshortfastvideo behind sirensbarbshortpovfastvideo
+show sirensbarbshortfastvideo behind sirensbarbfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex02.mp3"
+hide sirensbarbshortslowvideo
+hide sirensbarbshortpovfastvideo
+hide sirensbarbfastvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+window hide
+show harder:
+    xpos 1700 ypos 700    
+show slower:
+     xpos 1700 ypos 500     
+show pov:
+     xpos 50 ypos 500     
+call screen sirensbarbshortfastx()
+screen sirensbarbshortfastx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbShortFuckSlowx")
+    button:
+        xpos 1700
+        ypos 700
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckFastx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckPOVFastx")
+
+label SirensBarbShortFuckPOVSlowx:
+$ barbharderx = False
+window hide
+show sirensbarbshortpovslowvideo behind sirensbarbshortslowvideo
+show sirensbarbshortpovslowvideo behind sirensbarbshortpovfastvideo
+show sirensbarbshortpovslowvideo behind sirensbarbpovslowvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex01.mp3"
+hide sirensbarbshortslowvideo
+hide sirensbarbshortpovfastvideo
+hide sirensbarbpovslowvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+show harder:
+    xpos 1700 ypos 700    
+show faster:
+     xpos 1700 ypos 500     
+show sceneicon:
+     xpos 50 ypos 500     
+call screen sirensbarbshortpovslowx()
+screen sirensbarbshortpovslowx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbShortFuckPOVFastx")
+    button:
+        xpos 1700
+        ypos 700
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckPOVSlowx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckSlowx")
+
+label SirensBarbShortFuckPOVFastx:
+$ barbharderx = False
+window hide
+show sirensbarbshortpovfastvideo behind sirensbarbshortpovslowvideo
+show sirensbarbshortpovfastvideo behind sirensbarbshortfastvideo
+show sirensbarbshortpovfastvideo behind sirensbarbpovfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex02.mp3"
+hide sirensbarbshortpovslowvideo
+hide sirensbarbshortfastvideo
+hide sirensbarbpovfastvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+window hide
+show harder:
+    xpos 1700 ypos 700    
+show slower:
+     xpos 1700 ypos 500     
+show sceneicon:
+     xpos 50 ypos 500     
+call screen sirensbarbshortpovfastx()
+screen sirensbarbshortpovfastx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbShortFuckPOVSlowx")
+    button:
+        xpos 1700
+        ypos 700
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckPOVFastx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckFastx")
+
+label SirensBarbFuckSlowx:
+if barbharderx == False:
+    bk "I'm ready to take that fuckstick HARDER!"
+    mc "You want me to POUND YOU HARDER?"
+    bk "YES! JUST DO IT, YOU GODAM MONSTERSTUD!"
+    $ barbharderx = True        
+window hide
+show sirensbarbslowvideo behind sirensbarbfastvideo
+show sirensbarbslowvideo behind sirensbarbpovslowvideo
+show sirensbarbslowvideo behind sirensbarbshortslowvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex01.mp3"
+hide sirensbarbfastvideo
+hide sirensbarbpovslowvideo
+hide sirensbarbshortslowvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+show cum:
+    xpos 1750 ypos 1020    
+show softer:
+    xpos 1700 ypos 300    
+show faster:
+     xpos 1700 ypos 500     
+show pov:
+     xpos 50 ypos 500     
+call screen sirensbarbslowx()
+screen sirensbarbslowx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbFuckFastx")
+    button:
+        xpos 1700
+        ypos 300
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckSlowx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckPOVSlowx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensBarbCumEndx")
+
+label SirensBarbFuckFastx:
+if barbharderx == False:
+    bk "I'm ready to take that fuckstick HARDER!"
+    mc "You want me to POUND YOU HARDER?"
+    bk "YES! JUST DO IT, YOU GODAM MONSTERSTUD!"
+    $ barbharderx = True        
+window hide
+show sirensbarbfastvideo behind sirensbarbslowvideo
+show sirensbarbfastvideo behind sirensbarbpovfastvideo
+show sirensbarbfastvideo behind sirensbarbshortfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex02.mp3"
+hide sirensbarbslowvideo
+hide sirensbarbpovfastvideo
+hide sirensbarbshortfastvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+window hide
+show cum:
+    xpos 1750 ypos 1020    
+show softer:
+    xpos 1700 ypos 300    
+show slower:
+     xpos 1700 ypos 500     
+show pov:
+     xpos 50 ypos 500     
+call screen sirensbarbfastx()
+screen sirensbarbfastx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbFuckSlowx")
+    button:
+        xpos 1700
+        ypos 300
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckFastx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckPOVFastx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensBarbCumEndx")
+
+label SirensBarbFuckPOVSlowx:
+if barbharderx == False:
+    bk "I'm ready to take that fuckstick HARDER!"
+    mc "You want me to POUND YOU HARDER?"
+    bk "YES! JUST DO IT, YOU GODAM MONSTERSTUD!"
+    $ barbharderx = True        
+window hide
+show sirensbarbpovslowvideo behind sirensbarbslowvideo
+show sirensbarbpovslowvideo behind sirensbarbpovfastvideo
+show sirensbarbpovslowvideo behind sirensbarbshortpovslowvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex01.mp3"
+hide sirensbarbslowvideo
+hide sirensbarbpovfastvideo
+hide sirensbarbshortpovslowvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+show cum:
+    xpos 1750 ypos 1020    
+show softer:
+    xpos 1700 ypos 300    
+show faster:
+     xpos 1700 ypos 500     
+show sceneicon:
+     xpos 50 ypos 500     
+call screen sirensbarbpovslowx()
+screen sirensbarbpovslowx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbFuckPOVFastx")
+    button:
+        xpos 1700
+        ypos 300
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckPOVSlowx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckSlowx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensBarbCumEndx")
+
+label SirensBarbFuckPOVFastx:
+if barbharderx == False:
+    bk "I'm ready to take that fuckstick HARDER!"
+    mc "You want me to POUND YOU HARDER?"
+    bk "YES! JUST DO IT, YOU GODAM MONSTERSTUD!"
+    $ barbharderx = True        
+window hide
+show sirensbarbpovfastvideo behind sirensbarbpovslowvideo
+show sirensbarbpovfastvideo behind sirensbarbfastvideo
+show sirensbarbpovfastvideo behind sirensbarbshortpovfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex02.mp3"
+hide sirensbarbpovslowvideo
+hide sirensbarbfastvideo
+hide sirensbarbshortpovfastvideo
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+window hide
+show cum:
+    xpos 1750 ypos 1020    
+show softer:
+    xpos 1700 ypos 300    
+show slower:
+     xpos 1700 ypos 500     
+show sceneicon:
+     xpos 50 ypos 500     
+call screen sirensbarbpovfastx()
+screen sirensbarbpovfastx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensBarbFuckPOVSlowx")
+    button:
+        xpos 1700
+        ypos 300
+        xysize(120, 60)        
+        action Jump ("SirensBarbShortFuckPOVFastx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensBarbFuckFastx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensBarbCumEndx")
+
+label SirensBarbCumEndx:
+hide cum
+hide faster
+hide slower
+hide harder
+hide softer
+hide pov
+hide sceneicon
+with dissolve
+window hide
+if age >= 20:
+    bk "Please cum, [hero], I want to get FILLED UP with your YOUNG CREAM!"
+if age >= 18 and age <= 19:
+    bk "Please cum, [hero], I want to get FILLED UP with your YOUNG TEENAGE CREAM!"
+window hide
+show sirensbarbpovfastvideo behind sirensbarbpovslowvideo
+show sirensbarbpovfastvideo behind sirensbarbfastvideo
+show sirensbarbpovfastvideo behind sirensbarbshortpovfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex02.mp3"
+hide sirensbarbpovslowvideo
+hide sirensbarbfastvideo
+hide sirensbarbshortpovfastvideo
+mc "Alright, I'll show you how a SUPERSTUD COMES!"
+window hide
+pause 1.0
+stop channel1
+play channel1 "sounds/splooge02.mp3"
+show sirenscum01 at truecenter:
+    subpixel True
+    linear 3.0 zoom 1.2 xoffset 0 yoffset 0 
+with dissolve
+mc "I'M BLOWING NOOOOWWWW!"
+window hide
+with fastflash
+scene sirenscum02 with dissolve
+mc "AND MORE! RHAAA!"
+window hide
+with hpunch
+play sound "sounds/moan06.ogg"
+bk "AAAAH!"
+window hide
+with fastflash
+ta "Pull out, she loves to be DOUSED in warm ball-batter!"
+scene sirenscum03 with dissolve
+stop channel1
+play channel1 "sounds/boyorgasm01.mp3"
+mc "HERE YOU ARE, WARM CUM COMING YOUR WAY!!!"
+window hide
+with fastflash
+if age >= 20:
+    bk "He's CAKING me in red-hot SPUNK!"
+if age >= 18 and age <= 19:
+    bk "He's CAKING me in red-hot TEEN SPUNK!"
+scene sirenscum05 with dissolve
+stop channel1
+play sound "sounds/panting.mp3"
+mc "Damn it... I'm still HARD. I'm gonna fuck ANOTHER PUSSY!"
+bk "I guess it's your turn, Tabitha..."
+ta "Is he really STILL HARD?"
+scene sirenscum04 with dissolve
+play sound "sounds/thud.mp3"
+mc "Does this sound answer your question?"
+ta "Oh fuck... This is UNREAL..."
+
+scene sirenscum06 with dissolve
+play sound "sounds/moan02.mp3"
+ta "I can feel his HUGE HELMET... Already distending my pussylips..."
+
+label SirensTabFuckSlowx:
+$ tabharderx = False
+window hide
+show sirenstabslowvideo behind sirenstabfastvideo
+show sirenstabslowvideo behind sirenstabpovslowvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex03.mp3"
+hide sirenstabfastvideo
+hide sirenstabpovslowvideo
+hide cum
+hide faster
+hide slower
+hide pov
+hide sceneicon
+with dissolve
+show cum:
+    xpos 1750 ypos 1020    
+show faster:
+     xpos 1700 ypos 500     
+show pov:
+     xpos 50 ypos 500     
+call screen sirenstabslowx()
+screen sirenstabslowx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensTabFuckFastx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensTabFuckPOVSlowx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensTabCumEndx")
+
+label SirensTabFuckFastx:
+if tabharderx == False:
+    ta "I need to come, fuck me FASTER, STUD!"
+    $ tabharderx = True        
+window hide
+show sirenstabfastvideo behind sirenstabslowvideo
+show sirenstabfastvideo behind sirenstabpovfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex05.mp3"
+hide sirenstabslowvideo
+hide sirenstabpovfastvideo
+hide cum
+hide faster
+hide slower
+hide pov
+hide sceneicon
+with dissolve
+window hide
+show cum:
+    xpos 1750 ypos 1020    
+show slower:
+     xpos 1700 ypos 500     
+show pov:
+     xpos 50 ypos 500     
+call screen sirenstabfastx()
+screen sirenstabfastx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensTabFuckSlowx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensTabFuckPOVFastx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensTabCumEndx")
+
+label SirensTabFuckPOVSlowx:
+$ tabharderx = False
+window hide
+show sirenstabpovslowvideo behind sirenstabslowvideo
+show sirenstabpovslowvideo behind sirenstabpovfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex03.mp3"
+hide sirenstabslowvideo
+hide sirenstabpovfastvideo
+hide cum
+hide faster
+hide slower
+hide pov
+hide sceneicon
+with dissolve
+show cum:
+    xpos 1750 ypos 1020    
+show faster:
+     xpos 1700 ypos 500     
+show sceneicon:
+     xpos 50 ypos 500     
+call screen sirenstabpovslowx()
+screen sirenstabpovslowx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensTabFuckPOVFastx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensTabFuckSlowx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensTabCumEndx")
+
+label SirensTabFuckPOVFastx:
+if tabharderx == False:
+    ta "I need to come, fuck me FASTER, STUD!"
+    $ tabharderx = True        
+window hide
+show sirenstabpovfastvideo behind sirenstabpovslowvideo
+show sirenstabpovfastvideo behind sirenstabfastvideo
+pause 1.0
+stop channel1
+play channel1 "sounds/womansex05.mp3"
+hide sirenstabpovslowvideo
+hide sirenstabfastvideo
+hide cum
+hide faster
+hide slower
+hide pov
+hide sceneicon
+with dissolve
+window hide
+show cum:
+    xpos 1750 ypos 1020    
+show slower:
+     xpos 1700 ypos 500     
+show sceneicon:
+     xpos 50 ypos 500     
+call screen sirenstabpovfastx()
+screen sirenstabpovfastx():
+    modal True
+    button:
+        xpos 1700
+        ypos 500
+        xysize(180, 60)        
+        action Jump ("SirensTabFuckPOVSlowx")
+    button:
+        xpos 50
+        ypos 500
+        xysize(120, 60)        
+        action Jump ("SirensTabFuckFastx")
+    button:
+        xpos 1750
+        ypos 1020
+        xysize(120, 60)        
+        action Jump ("SirensTabCumEndx")
+
+label SirensTabCumEndx:
+ta "You're gonna cum again, aren't you?"
+mc "Fuck yeah..."
+bk "He's gonna pump you FULL of his seed, Tabitha. You'd better get prepared!"
+ta "Oh, I AM READY!"
+scene sirenstabcum01 with dissolve
+stop channel1
+play sound "sounds/splooge01.mp3"
+mc "Fuck, AAAAAHHH!"
+window hide
+with fastflash
+ta "YES, YES, I'M CUMMING TOO!"
+scene sirenstabcum02 with dissolve
+play sound "sounds/moan06.ogg"
+mc "ALL THE WAY IN!"
+window hide
+with hpunch
+ta "AAAAH, IT'S SO DEEP!!!"
+scene sirenstabcum03 with dissolve
+play sound "sounds/boymoan03.mp3"
+mc "OH GOD, I still NEED TO CUM SO MUCH, AAAH!"
+window hide
+with fastflash
+bk "EMPTY THOSE BALLS, COME ON, COVER ME AGAIN IN YOUR SPUNK!"
+scene sirenstabcum04 with dissolve
+play sound "sounds/boymoan05.mp3"
+mc "I'm CUMMING, BIG TIIIIMMME!"
+window hide
+with fastflash
+ta "I can even HEAR his MASSIVE cumblasts!"
+window hide 
+with hpunch
+play sound "sounds/boymoan03.mp3"
+mc "Take those last few shots, my little cum-sluts! RHAAA!"
+scene sirenstabcum05 with dissolve
+bk "He did it again... I'm absolutely DRENCHED in his [age]yo scum..."
+ta "I can feel his goo sliding down my poor ass... And he called us \"cum-sluts\", you heard that?"
+bk "Yes, that was highly inappropriate, even though some of our clientele DO like to be domin..."
+play sound "sounds/spanking.mp3"
+scene sirenstabcum06 with dissolve
+ta "Ouch! What.. what are you doing?"
+mc "You deserve a punishment for being my little cock-sluts today..."
+scene sirenstabcum05 with dissolve
+bk "He's so MANLY, even though he's just a BOY!"
+play sound "sounds/spanking.mp3"
+scene sirenstabcum06 with dissolve
+ta "AAAH, yes, slap me Daddy!"
+scene sirenstabcum05 with dissolve
+bk "Daddy? Why are you calling him that???"
+play sound "sounds/spanking.mp3"
+scene sirenstabcum06 with dissolve
+ta "Ow! Err... I don't know, I just blurted it out..."
+
+scene sirensbackroombackground
+show tabithacum01 at midright
+show keencum02 at midleft
+with fade
+ta "So, do you reckon he passed the test, Barbara?"
+hide keencum02
+show keencum01 at midleft
+with fastdissolve
+bk "I suppose we could hire him for ONE night at least and see how he BEHAVES!"
+hide tabithacum01
+show tabithacum02 at midright
+with fastdissolve
+ta "I'll keep an eye on him. And I'll SLIT HIS THROAT if he does!"
+mc "Wow. Is there an union I can join to fight these violent corporate threats?"
+bk "No."
+hide tabithacum02
+show tabithacum01 at midright
+with fastdissolve
+ta "We'll let you know when we need you. Now GO. Back to the gallery"
+jump KeenGallery
