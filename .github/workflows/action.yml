@@ -1,37 +1,21 @@
-name: setup-renpy
-description: Set up GitHub Actions workflow with Ren'Py CLI
-author: remarkablemark
-inputs:
-  cli-name:
-    description: CLI name
-    required: false
-    default: renpy-cli
-  cli-version:
-    description: CLI version
-    required: false
-    default: 8.3.6
-  launcher-name:
-    description: Launcher name
-    required: false
-    default: renpy-launcher
-  rapt:
-    description: Android Support (RAPT)
-    required: false
-    default: false
-  renios:
-    description: iOS Support (Renios)
-    required: false
-    default: false
-  web:
-    description: Web Platform Support (Renpyweb)
-    required: false
-    default: false
-outputs:
-  launcher:
-    description: Ren'Py launcher path
-runs:
-  using: node20
-  main: dist/index.js
-branding:
-  icon: book-open
-  color: yellow
+name: Ren'Py CLI
+on: push
+jobs:
+  renpy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Ren'Py
+        uses: remarkablegames/setup-renpy@v1
+
+      - name: Get version
+        run: renpy-cli --version
+
+      - name: See help
+        run: renpy-cli --help
+
+      - name: Set projects directory
+        run: renpy-launcher set_projects_directory ..
+      - name: IOS 
+        uses: remarkablegames/setup-renpy@v1
+        with:
+          renios: true
