@@ -1,7 +1,23 @@
 on: push
 jobs:
-  renpy:
+  renpy-linux:
     runs-on: ubuntu-latest
     steps:
       - name: Setup Ren'Py
         uses: remarkablegames/setup-renpy@v1
+
+      - name: Ren'Py version
+        run: |
+          renpy-cli --version
+          renpy-cli --help
+
+  renpy-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Setup Ren'Py
+        uses: remarkablegames/setup-renpy@v1
+
+      - name: Ren'Py version
+        run: |
+          renpy-cli --version
+          renpy-cli --help
