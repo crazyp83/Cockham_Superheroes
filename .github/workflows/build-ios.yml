@@ -1,66 +1,41 @@
-name: Build Ren'Py iOS App
+name: Build Ren'Py iOS
 
-on:
-  push:
-    branches:
-      - main
+# Trigger the workflow on push events
+on: [push]
 
 jobs:
   build:
+    # Use a macOS runner since Xcode is required for iOS builds
     runs-on: macos-latest
 
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Check out the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      # Step 2: Set up Ren'Py
-      - name: Set up Ren'Py
-        uses: remarkablegames/setup-renpy@v1
+      # Step 2: Set up Ren'Py with version 8.3.7
+      - name: Setup Ren'Py
+        uses: renpy/setup-renpy@v1
         with:
-          version: '8.1.1'  # Specify the desired Ren'Py version
+          version: '8.3.7'          # Specifies Ren'Py SDK version 8.3.7
+          update_path: true         # Adds Ren'Py to the PATH
 
-      # Step 3: Download and install Ren'iOS
-      - name: Download and install Ren'iOS
+      # Step 3: Generate the iOS project with Ren'Py
+      - name: Build Ren'Py iOS project
+        run: renpy.sh . distribute --package ios
+
+      # Step 4: Build the Xcode project without signing
+      - name: Build Xcode project
         run: |
-          curl -L https://www.renpy.org/dl/8.3.7/renpy-8.3.7-renios.zip -o renios.zip
-          mkdir $HOME/renpy/renios
-          unzip renios.zip -d $HOME/renpy/renios
-        env:
-          RENPY_PATH: $HOME/renpy  # Adjust based on setup-renpy output
+          xcodebuild -project build/ios/Cockham_Superheroes.xcodeproj \
+                     -scheme Cockham_Superheroes \
+                     -configuration Release \
+                     CODE_SIGN_IDENTITY="" \
+                     CODE_SIGNING_REQUIRED=NO
 
-      # Step 4: Create script to generate Xcode project
-      - name: Create Ren'Py script for Xcode project
-        run: |
-          cat << 'EOF' > create_ios.rpy
-          init python:
-              from renpy.project import Project
-              p = Project("${{ github.workspace }}/game")  # Path to your Ren'Py game directory
-              from launcher.game.ios import ios_create
-              ios_create(p, gui=False, target="${{ github.workspace }}/ios-build")
-          EOF
-
-      # Step 5: Generate Xcode project
-      - name: Generate Xcode project
-        run: |
-          $HOME/renpy/renpy.sh $HOME/renpy/launcher --script ${{ github.workspace }}/create_ios.rpy
-
-      # Step 6: Build iOS app
-      - name: Build iOS app
-        uses: yukiarrr/ios-build-action@v1.12.0
+      # Step 5: Upload the build artifact
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v2
         with:
-          project-path: ${{ github.workspace }}/ios-build/yourgame.xcodeproj  # Adjust based on output
-          scheme: 'yourgame'  # Replace with your game's scheme name
-          configuration: 'Release'
-          export-method: 'app-store'  # Options: app-store, ad-hoc, development, etc.
-          certificate-uri: ${{ secrets.CERTIFICATE_URI }}  # Store in GitHub Secrets
-          certificate-password: ${{ secrets.CERTIFICATE_PASSWORD }}
-          provisioning-profile: ${{ secrets.PROVISIONING_PROFILE }}
-          team-id: ${{ secrets.TEAM_ID }}
-
-      # Optional: Upload the .ipa file as an artifact
-      - name: Upload iPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: iOS-App
-          path: '*.ipa'
+          name: Cockham_Superheroes_ios_build
+          path: build/ios/build/Release-iphoneos/Cockham_Superheroes.app

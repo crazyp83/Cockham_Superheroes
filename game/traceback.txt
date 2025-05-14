@@ -1,0 +1,28 @@
+﻿I'm sorry, but an uncaught exception occurred.
+
+While running game code:
+  File "game/cmroom.rpy", line 2133, in script
+    if chosefootjob:
+  File "game/cmroom.rpy", line 2133, in <module>
+    if chosefootjob:
+NameError: name 'chosefootjob' is not defined
+
+-- Full Traceback ------------------------------------------------------------
+
+Full traceback:
+  File "game/cmroom.rpy", line 2133, in script
+    if chosefootjob:
+  File "C:\Users\lucge\OneDrive\Documents\RENPY\renpy-7.2.0-sdk\renpy\ast.py", line 1803, in execute
+    if renpy.python.py_eval(condition):
+  File "C:\Users\lucge\OneDrive\Documents\RENPY\renpy-7.2.0-sdk\renpy\python.py", line 1960, in py_eval
+    return py_eval_bytecode(code, globals, locals)
+  File "C:\Users\lucge\OneDrive\Documents\RENPY\renpy-7.2.0-sdk\renpy\python.py", line 1953, in py_eval_bytecode
+    return eval(bytecode, globals, locals)
+  File "game/cmroom.rpy", line 2133, in <module>
+    if chosefootjob:
+NameError: name 'chosefootjob' is not defined
+
+Windows-8-6.2.9200
+Ren'Py 7.2.0.424
+Cockham v0.5.1
+Fri Nov 24 07:58:03 2023
