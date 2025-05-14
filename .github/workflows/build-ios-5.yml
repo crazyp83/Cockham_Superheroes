@@ -1,8 +1,9 @@
-name: Build Ren'Py iOS App test 1
+name: Build Ren'Py iOS App test 5
 
 on:
-  workflow_dispatch:
-
+  push:
+    tags:
+      - "v*"
 jobs:
   build:
     runs-on: macos-latest
@@ -10,7 +11,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-
     - name: Download Ren'Py SDK
       run: |
         curl -o renpy-sdk.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-sdk.zip
@@ -35,3 +35,9 @@ jobs:
         cd renpy/renpy-8.3.7-sdk
         ./renpy.sh launcher ios_create $GITHUB_WORKSPACE ios
         ./renpy.sh launcher ios_populate $GITHUB_WORKSPACE ios
+ 
+      # Upload the IPA file as a release asset
+    - name: Create Release
+      uses: ncipollo/release-action@v1.16.0
+      with:
+        artifacts: "*.ipa"
