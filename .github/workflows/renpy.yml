@@ -1,0 +1,7 @@
+on: push
+jobs:
+  renpy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Ren'Py
+        uses: remarkablegames/setup-renpy@v1
