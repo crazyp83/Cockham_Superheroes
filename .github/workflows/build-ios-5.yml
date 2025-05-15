@@ -16,7 +16,7 @@ jobs:
         run: |
           git tag v1.0.0
           git push origin v1.0.0
-  build:
+   build:
     runs-on: macos-latest
 
     steps:
