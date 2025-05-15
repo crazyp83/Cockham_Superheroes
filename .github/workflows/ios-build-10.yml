@@ -117,11 +117,17 @@ jobs:
           zip -r "$IPA_NAME" Payload/
           echo "IPA_PATH=$GITHUB_WORKSPACE/temp/$IPA_NAME" >> $GITHUB_ENV
 
-      - name: Create release and upload asset
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_GITEATOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_GITEATOKEN }}
+      - name: Split IPA into smaller chunks
         run: |
-          gh release create "${{ github.ref_name }}" "${{ env.IPA_PATH }}" \
+          cd "$GITHUB_WORKSPACE/temp"
+          split -b 1G "$IPA_NAME" "Cockham_Superheros_part_"
+          echo "SPLIT_FILES=$(ls Cockham_Superheros_part_*)" >> $GITHUB_ENV
+
+      - name: Create release and upload split assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITEATOKEN }}
+          GH_TOKEN: ${{ secrets.GITEATOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" $(echo "${{ env.SPLIT_FILES }}" | tr '\n' ' ') \
             --title "Release ${{ github.ref_name }}" \
-            --notes "Automated release"
+            --notes "Automated release. To reassemble the IPA, use: cat Cockham_Superheros_part_* > Cockham_Superheros.ipa"
