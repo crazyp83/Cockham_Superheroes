@@ -1,10 +1,21 @@
 name: Build Ren'Py iOS App test 5
 
-on:
+on: 
+
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 jobs:
+   tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Create and push tag
+        run: |
+          git tag v1.0.0
+          git push origin v1.0.0
   build:
     runs-on: macos-latest
 
@@ -39,5 +50,6 @@ jobs:
       # Upload the IPA file as a release asset
     - name: Create Release
       uses: ncipollo/release-action@v1.16.0
+      commit: main
       with:
         artifacts: "*.ipa"
