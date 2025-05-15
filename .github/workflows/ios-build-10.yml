@@ -128,8 +128,8 @@ jobs:
 
       - name: Create release and upload split assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITEATOKEN }}
+          GH_TOKEN: ${{ secrets.GITEATOKEN }}
         run: |
           cd "$GITHUB_WORKSPACE/temp"
           gh release create "${{ github.ref_name }}" "${{ env.IPA_NAME }}.7z.*" \
