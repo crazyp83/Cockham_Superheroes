@@ -55,7 +55,7 @@ jobs:
           echo "IPA_PATH=$GITHUB_WORKSPACE/temp/$IPA_NAME" >> $GITHUB_ENV
 
       - name: Upload IPA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: unsigned-ipa
           path: ${{ env.IPA_PATH }}

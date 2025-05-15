@@ -22,6 +22,24 @@ jobs:
           curl -o renpy-sdk.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-sdk.zip
           unzip renpy-sdk.zip -d renpy
 
+      - name: Install rapt
+        if: steps.cache-renpy.outputs.cache-hit != 'true'
+        run: |
+          curl -o rapt.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-rapt.zip
+          unzip rapt.zip -d renpy/renpy-8.3.7-sdk
+
+      - name: Install renios
+        if: steps.cache-renpy.outputs.cache-hit != 'true'
+        run: |
+          curl -o renios.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-renios.zip
+          unzip renios.zip -d renpy/renpy-8.3.7-sdk
+
+      - name: Install renpyweb
+        if: steps.cache-renpy.outputs.cache-hit != 'true'
+        run: |
+          curl -o renpyweb.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-web.zip
+          unzip renpyweb.zip -d renpy/renpy-8.3.7-sdk
+
       - name: Build for iOS
         run: |
           cd renpy/renpy-8.3.7-sdk
@@ -32,7 +50,7 @@ jobs:
         run: |
           XCODEPROJ=$(find "$GITHUB_WORKSPACE/ios" -maxdepth 1 -name "*.xcodeproj" | head -n 1)
           if [ -z "$XCODEPROJ" ]; then
-            echo "Error: No .xcodeproj file found in $GITHUB_WORKSPACE/ios"
+            echo "Error: No .xcodeproj file found"
             exit 1
           fi
           XCODEPROJ_NAME=$(basename "$XCODEPROJ")
@@ -43,9 +61,9 @@ jobs:
       - name: Build Xcode project without signing
         run: |
           cd "$GITHUB_WORKSPACE/ios"
-          xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
+          xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" PROVISIONING_PROFILE=""
 
-      - name: Create IPA
+      - name: Create IPA from unsigned app bundle
         run: |
           cd "$GITHUB_WORKSPACE/ios"
           BUILD_SETTINGS=$(xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos -showBuildSettings)
