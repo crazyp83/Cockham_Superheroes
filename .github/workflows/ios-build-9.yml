@@ -1,0 +1,66 @@
+name: Build Ren'Py iOS App
+
+on: push
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache Ren'Py SDK
+        id: cache-renpy
+        uses: actions/cache@v3
+        with:
+          path: renpy
+          key: renpy-8.3.7-${{ runner.os }}
+
+      - name: Download Ren'Py SDK
+        if: steps.cache-renpy.outputs.cache-hit != 'true'
+        run: |
+          curl -o renpy-sdk.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-sdk.zip
+          unzip renpy-sdk.zip -d renpy
+
+      - name: Build for iOS
+        run: |
+          cd renpy/renpy-8.3.7-sdk
+          ./renpy.sh launcher ios_create "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/ios"
+          ./renpy.sh launcher ios_populate "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/ios"
+
+      - name: Find Xcode project
+        run: |
+          XCODEPROJ=$(find "$GITHUB_WORKSPACE/ios" -maxdepth 1 -name "*.xcodeproj" | head -n 1)
+          if [ -z "$XCODEPROJ" ]; then
+            echo "Error: No .xcodeproj file found in $GITHUB_WORKSPACE/ios"
+            exit 1
+          fi
+          XCODEPROJ_NAME=$(basename "$XCODEPROJ")
+          SCHEME_NAME="${XCODEPROJ_NAME%.xcodeproj}"
+          echo "XCODEPROJ_PATH=$XCODEPROJ" >> $GITHUB_ENV
+          echo "SCHEME_NAME=$SCHEME_NAME" >> $GITHUB_ENV
+
+      - name: Build Xcode project without signing
+        run: |
+          cd "$GITHUB_WORKSPACE/ios"
+          xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CODE_SIGN_IDENTITY=""
+
+      - name: Create IPA
+        run: |
+          cd "$GITHUB_WORKSPACE/ios"
+          BUILD_SETTINGS=$(xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos -showBuildSettings)
+          BUILT_PRODUCTS_DIR=$(echo "$BUILD_SETTINGS" | grep BUILT_PRODUCTS_DIR | cut -d '=' -f2 | xargs)
+          FULL_PRODUCT_NAME=$(echo "$BUILD_SETTINGS" | grep FULL_PRODUCT_NAME | cut -d '=' -f2 | xargs)
+          APP_PATH="$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME"
+          IPA_NAME="MyApp.ipa"
+          mkdir -p "$GITHUB_WORKSPACE/temp/Payload"
+          cp -R "$APP_PATH" "$GITHUB_WORKSPACE/temp/Payload/"
+          cd "$GITHUB_WORKSPACE/temp"
+          zip -r "$IPA_NAME" Payload/
+          echo "IPA_PATH=$GITHUB_WORKSPACE/temp/$IPA_NAME" >> $GITHUB_ENV
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: unsigned-ipa
+          path: ${{ env.IPA_PATH }}
