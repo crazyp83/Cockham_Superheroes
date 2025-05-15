@@ -1,4 +1,4 @@
-name: Build Ren'Py iOS App test 5
+  name: Build Ren'Py iOS App test 5
 
 on: 
   push:
@@ -50,18 +50,10 @@ jobs:
         find / -maxdepth 1 -type d -name "renpy.app" -exec mv {} "Cockham Superheros.app" Payload/ \; 
         zip -r "Cockham Superheros.ipa" Payload \;
         rm -rf Payload \;
-    - name: Create Release
-      uses: ncipollo/release-action@v1
-      with:
-        tag: ${{ github.ref_name }}
-        token: ${{ secrets.GITEATOKEN }}
-        name: Release ${{ github.ref_name }}
-        #bodyFile: changelog.txt
-        artifacts: "Cockham_Superheros.zip"
-        artifactContentType: application/zip
-        draft: false
-        prerelease: false
-        artifactErrorsFailBuild: true
-        generateReleaseNotes: true
-        allowUpdates: true
-        makeLatest: true
+
+     - name: Create release and upload asset
+         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          shopt -s globstar
+          gh release create ${{ github.ref_name }} **/Cockham_Superheros.zip --title "Release ${{ github.ref_name }}" --notes "Automated release"
