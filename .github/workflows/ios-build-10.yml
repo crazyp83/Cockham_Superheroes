@@ -9,6 +9,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Install 7zip
+        run: brew install p7zip
+
       - name: Cache repository checkout
         id: cache-checkout
         uses: actions/cache@v3
@@ -110,26 +113,31 @@ jobs:
 
       - name: Create IPA from unsigned app bundle
         run: |
-          IPA_NAME="Cockham Superheros.ipa"
+          echo "IPA_NAME=Cockham Superheros.ipa" >> $GITHUB_ENV
           mkdir -p "$GITHUB_WORKSPACE/temp/Payload"
           cp -R "${{ env.APP_PATH }}" "$GITHUB_WORKSPACE/temp/Payload/"
           cd "$GITHUB_WORKSPACE/temp"
-          zip -r -s 1g "$IPA_NAME" Payload/
+          zip -r "${{ env.IPA_NAME }}" Payload/
+
+      - name: Split IPA using 7zip
+        run: |
+          cd "$GITHUB_WORKSPACE/temp"
+          7z a -v1g "${{ env.IPA_NAME }}.7z" "${{ env.IPA_NAME }}"
           echo "Split files created:"
-          ls Cockham\ Superheros.*
+          ls "${{ env.IPA_NAME }}.7z.*"
 
       - name: Create release and upload split assets
         env:
-          GITHUB_TOKEN: ${{ secrets.GITEATOKEN }}
-          GH_TOKEN: ${{ secrets.GITEATOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd "$GITHUB_WORKSPACE/temp"
-          gh release create "${{ github.ref_name }}" Cockham\ Superheros.* \
+          gh release create "${{ github.ref_name }}" "${{ env.IPA_NAME }}.7z.*" \
             --title "Release ${{ github.ref_name }}" \
-            --notes "Automated release. To use the IPA file, download all the parts (Cockham Superheros.ipa, Cockham Superheros.z01, etc.) to the same directory, then run:
+            --notes "Automated release. To extract the IPA, download all the parts (e.g., ${{ env.IPA_NAME }}.7z.001, etc.) to the same directory, then run:
 
             \`\`\`bash
-            zip -FF \"Cockham Superheros.ipa\" --out \"combined.ipa\"
+            7z x \"${{ env.IPA_NAME }}.7z.001\"
             \`\`\`
 
-            This will create the complete IPA file."
+            This will extract the IPA file."
