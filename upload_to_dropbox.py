@@ -20,7 +20,7 @@ with open(local_file_path, 'rb') as f:
         dbx.files_upload(f.read(), dropbox_file_path, mode=dropbox.files.WriteMode.overwrite)
     else:
         # For large files, use upload sessions
-        upload_session_start_result = dbx.upload_session_start(f.read(chunk_size))
+        upload_session_start_result = files_dbx.upload_session_start(f.read(chunk_size))
         cursor = dropbox.files.UploadSessionCursor(
             session_id=upload_session_start_result.session_id,
             offset=f.tell()
