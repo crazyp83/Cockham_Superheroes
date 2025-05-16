@@ -9,6 +9,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Cache repository checkout
+        id: cache-checkout
+        uses: actions/cache@v3
+        with:
+          path: |
+            .git
+            .
+          key: checkout-${{ github.sha }}-${{ runner.os }}
+          restore-keys: |
+            checkout-
+
       - name: Cache Ren'Py SDK
         id: cache-renpy
         uses: actions/cache@v3
@@ -47,7 +58,6 @@ jobs:
           cd renpy/renpy-8.3.7-sdk
           ./renpy.sh launcher ios_create "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/ios"
           ./renpy.sh launcher ios_populate "$GITHUB_WORKSPACE" "$GITHUB_WORKSPACE/ios"
-          # Debug: List contents of ios directory
           echo "Contents of $GITHUB_WORKSPACE/ios:"
           ls -la "$GITHUB_WORKSPACE/ios"
 
@@ -71,33 +81,57 @@ jobs:
           echo "SCHEME_NAME=$SCHEME_NAME" >> $GITHUB_ENV
           echo "Found Xcode project: $XCODEPROJ_NAME with scheme: $SCHEME_NAME"
 
-      - name: Build Xcode project
+      - name: Build Xcode project without signing
         run: |
           cd "$GITHUB_WORKSPACE/ios"
-          xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos
+          xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos CODE_SIGN_IDENTITY="" PROVISIONING_PROFILE="" | tee build.log
+          if [ $? -ne 0 ]; then
+            echo "Build failed. Check build.log for details."
+            cat build.log
+            exit 1
+          fi
 
-      - name: Create application Bundle and convert to .ipa
+      - name: Debug build settings and locate .app bundle
         run: |
           cd "$GITHUB_WORKSPACE/ios"
           BUILD_SETTINGS=$(xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos -showBuildSettings)
-          BUILT_PRODUCTS_DIR=$(echo "$BUILD_SETTINGS" | grep BUILT_PRODUCTS_DIR | cut -d '=' -f2 | xargs)
-          FULL_PRODUCT_NAME=$(echo "$BUILD_SETTINGS" | grep FULL_PRODUCT_NAME | cut -d '=' -f2 | xargs)
+          echo "$BUILD_SETTINGS"
+          BUILT_PRODUCTS_DIR=$(echo "$BUILD_SETTINGS" | grep -E '^\s*BUILT_PRODUCTS_DIR' | cut -d '=' -f2 | xargs)
+          FULL_PRODUCT_NAME=$(echo "$BUILD_SETTINGS" | grep -E '^\s*FULL_PRODUCT_NAME' | cut -d '=' -f2 | xargs)
           APP_PATH="$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME"
-          IPA_NAME="Cockham Superheros.ipa"
-          if [ ! -d "$APP_PATH" ]; then
+          echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          if [ -d "$APP_PATH" ]; then
+            echo ".app bundle found at $APP_PATH"
+          else
             echo "Error: .app bundle not found at $APP_PATH"
+            ls -la "$BUILT_PRODUCTS_DIR" || echo "Directory not found"
             exit 1
           fi
+
+      - name: Create IPA from unsigned app bundle
+        run: |
+          IPA_NAME="Cockham Superheros.ipa"
           mkdir -p "$GITHUB_WORKSPACE/temp/Payload"
-          cp -R "$APP_PATH" "$GITHUB_WORKSPACE/temp/Payload/"
+          cp -R "${{ env.APP_PATH }}" "$GITHUB_WORKSPACE/temp/Payload/"
           cd "$GITHUB_WORKSPACE/temp"
-          zip -r --symlinks "$IPA_NAME" Payload/
+          zip -r "$IPA_NAME" Payload/
           echo "IPA_PATH=$GITHUB_WORKSPACE/temp/$IPA_NAME" >> $GITHUB_ENV
 
-      - name: Create release and upload asset
+      - name: Install Dropbox SDK
+        run: pip install dropbox
+
+      - name: Upload IPA to Dropbox and Get Shareable Link
+        env:
+          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
+        run: |
+          SHAREABLE_LINK=$(python upload_to_dropbox.py)
+          echo "SHAREABLE_LINK=$SHAREABLE_LINK" >> $GITHUB_ENV
+
+      - name: Create GitHub Release with Download Link
         env:
           GITHUB_TOKEN: ${{ secrets.GITEATOKEN }}
+          GH_TOKEN: ${{ secrets.GITEATOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" "${{ env.IPA_PATH }}" \
+          gh release create "${{ github.ref_name }}" \
             --title "Release ${{ github.ref_name }}" \
-            --notes "Automated release"
+            --notes "Automated release\n\nDownload IPA from Dropbox: ${{ env.SHAREABLE_LINK }}"
