@@ -98,8 +98,27 @@ jobs:
           echo "$BUILD_SETTINGS"
           BUILT_PRODUCTS_DIR=$(echo "$BUILD_SETTINGS" | grep -E '^\s*BUILT_PRODUCTS_DIR' | cut -d '=' -f2 | xargs)
           FULL_PRODUCT_NAME=$(echo "$BUILD_SETTINGS" | grep -E '^\s*FULL_PRODUCT_NAME' | cut -d '=' -f2 | xargs)
+          PRODUCT_NAME=$(echo "$BUILD_SETTINGS" | grep -E '^\s*PRODUCT_NAME' | cut -d '=' -f2 | xargs)
+          VERSION=$(echo "$BUILD_SETTINGS" | grep -E '^\s*MARKETING_VERSION' | cut -d '=' -f2 | xargs)
+          BUNDLE_ID=$(echo "$BUILD_SETTINGS" | grep -E '^\s*PRODUCT_BUNDLE_IDENTIFIER' | cut -d '=' -f2 | xargs)
           APP_PATH="$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME"
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
+          echo "PRODUCT_NAME=$PRODUCT_NAME" >> $GITHUB_ENV
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "BUNDLE_ID=$BUNDLE_ID" >> $GITHUB_ENV
+          if [ -z "$PRODUCT_NAME" ]; then
+            echo "Error: PRODUCT_NAME not found in build settings"
+            exit 1
+          fi
+          if [ -z "$VERSION" ]; then
+            echo "Warning: MARKETING_VERSION not found, defaulting to 'unknown'"
+            echo "VERSION=unknown" >> $GITHUB_ENV
+          fi
+          if [ -z "$BUNDLE_ID" ]; then
+            echo "Warning: PRODUCT_BUNDLE_IDENTIFIER not found"
+          else
+            echo "Bundle ID: $BUNDLE_ID"
+          fi
           if [ -d "$APP_PATH" ]; then
             echo ".app bundle found at $APP_PATH"
           else
@@ -110,39 +129,23 @@ jobs:
 
       - name: Create IPA from unsigned app bundle
         run: |
-          IPA_NAME="Cockham Superheros.ipa"
+          IPA_NAME="${PRODUCT_NAME}-${VERSION}.ipa"
           mkdir -p "$GITHUB_WORKSPACE/temp/Payload"
-          cp -R "${{ env.APP_PATH }}" "$GITHUB_WORKSPACE/temp/Payload/"
+          cp -R "$APP_PATH" "$GITHUB_WORKSPACE/temp/Payload/"
           cd "$GITHUB_WORKSPACE/temp"
           zip -r "$IPA_NAME" Payload/
           echo "IPA_PATH=$GITHUB_WORKSPACE/temp/$IPA_NAME" >> $GITHUB_ENV
+          echo "Created IPA: $IPA_NAME"
 
-      - name: Upload IPA to Dropbox
+      - name: Install Dropbox SDK
+        run: pip install dropbox
+
+      - name: Upload IPA to Dropbox and Get Shareable Link
         env:
           DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
         run: |
-          curl -X POST https://content.dropboxapi.com/2/files/upload \
-            --header "Authorization: Bearer $DROPBOX_ACCESS_TOKEN" \
-            --header "Dropbox-API-Arg: {\"path\": \"/Cockham Superheros.ipa\"}" \
-            --header "Content-Type: application/octet-stream" \
-            -T @"${{ env.IPA_PATH }}"
-
-      - name: Create Shareable Link
-        env:
-          DROPBOX_ACCESS_TOKEN: ${{ secrets.DROPBOX_ACCESS_TOKEN }}
-        run: |
-          RESPONSE=$(curl -X POST https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings \
-            --header "Authorization: Bearer $DROPBOX_ACCESS_TOKEN" \
-            --header "Content-Type: application/json" \
-            --data "{\"path\": \"/Cockham Superheros.ipa\", \"settings\": {\"requested_visibility\": \"public\"}}")
-          echo "RESPONSE=$RESPONSE" >> $GITHUB_ENV
-          echo "Shareable link response: $RESPONSE"
-
-      - name: Extract Shareable Link
-        run: |
-          SHAREABLE_LINK=$(echo "${{ env.RESPONSE }}" | python -c "import sys, json; print(json.load(sys.stdin)['url'])")
+          SHAREABLE_LINK=$(python upload_to_dropbox.py)
           echo "SHAREABLE_LINK=$SHAREABLE_LINK" >> $GITHUB_ENV
-          echo "Extracted shareable link: $SHAREABLE_LINK"
 
       - name: Create GitHub Release with Download Link
         env:
@@ -150,5 +153,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITEATOKEN }}
         run: |
           gh release create "${{ github.ref_name }}" \
-            --title "Release ${{ github.ref_name }}" \
-            --notes "Automated release\n\nDownload IPA from Dropbox: ${{ env.SHAREABLE_LINK }}"
+            --title "${{ env.PRODUCT_NAME }} ${{ env.VERSION }}" \
+            --notes "Automated release\nVersion: ${{ env.VERSION }}\nBundle ID: ${{ env.BUNDLE_ID }}\nDownload IPA from Dropbox: ${{ env.SHAREABLE_LINK }}"
