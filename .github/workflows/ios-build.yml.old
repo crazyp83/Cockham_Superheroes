@@ -125,7 +125,7 @@ jobs:
             --header "Authorization: Bearer $DROPBOX_ACCESS_TOKEN" \
             --header "Dropbox-API-Arg: {\"path\": \"/Cockham Superheros.ipa\"}" \
             --header "Content-Type: application/octet-stream" \
-            --data-binary @"${{ env.IPA_PATH }}"
+            -T @"${{ env.IPA_PATH }}"
 
       - name: Create Shareable Link
         env:
