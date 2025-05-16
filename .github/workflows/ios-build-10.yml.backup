@@ -1,25 +1,23 @@
 name: Build Ren'Py iOS App
 
+# Trigger the workflow on any push event
 on: push
 
 jobs:
   build:
+    # Use the latest macOS runner, as iOS builds require macOS
     runs-on: macos-latest
+
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Cache repository checkout
-        id: cache-checkout
-        uses: actions/cache@v3
-        with:
-          path: |
-            .git
-            .
-          key: checkout-${{ github.sha }}-${{ runner.os }}
-          restore-keys: |
-            checkout-
+      # Step 2: Install 7zip for splitting the IPA file
+      - name: Install 7zip
+        run: brew install p7zip
 
+      # Step 3: Cache Ren'Py SDK to speed up builds
       - name: Cache Ren'Py SDK
         id: cache-renpy
         uses: actions/cache@v3
@@ -29,30 +27,35 @@ jobs:
           restore-keys: |
             renpy-8.3.7-
 
+      # Step 4: Download Ren'Py SDK if not cached
       - name: Download Ren'Py SDK
         if: steps.cache-renpy.outputs.cache-hit != 'true'
         run: |
           curl -o renpy-sdk.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-sdk.zip
           unzip renpy-sdk.zip -d renpy
 
+      # Step 5: Download and install rapt if not cached
       - name: Download and install rapt
         if: steps.cache-renpy.outputs.cache-hit != 'true'
         run: |
           curl -o rapt.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-rapt.zip
           unzip rapt.zip -d renpy/renpy-8.3.7-sdk
 
+      # Step 6: Download and install renios if not cached
       - name: Download and install renios
         if: steps.cache-renpy.outputs.cache-hit != 'true'
         run: |
           curl -o renios.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-renios.zip
           unzip renios.zip -d renpy/renpy-8.3.7-sdk
 
+      # Step 7: Download and install renpyweb if not cached
       - name: Download and install renpyweb
         if: steps.cache-renpy.outputs.cache-hit != 'true'
         run: |
           curl -o renpyweb.zip https://www.renpy.org/dl/8.3.7/renpy-8.3.7-web.zip
           unzip renpyweb.zip -d renpy/renpy-8.3.7-sdk
 
+      # Step 8: Build the iOS app using Ren'Py
       - name: Build for iOS
         run: |
           cd renpy/renpy-8.3.7-sdk
@@ -61,6 +64,7 @@ jobs:
           echo "Contents of $GITHUB_WORKSPACE/ios:"
           ls -la "$GITHUB_WORKSPACE/ios"
 
+      # Step 9: Verify the iOS directory exists
       - name: Check if iOS directory exists
         run: |
           if [ ! -d "$GITHUB_WORKSPACE/ios" ]; then
@@ -68,6 +72,7 @@ jobs:
             exit 1
           fi
 
+      # Step 10: Locate the Xcode project
       - name: Find Xcode project
         run: |
           XCODEPROJ=$(find "$GITHUB_WORKSPACE/ios" -maxdepth 1 -name "*.xcodeproj" | head -n 1)
@@ -81,6 +86,7 @@ jobs:
           echo "SCHEME_NAME=$SCHEME_NAME" >> $GITHUB_ENV
           echo "Found Xcode project: $XCODEPROJ_NAME with scheme: $SCHEME_NAME"
 
+      # Step 11: Build the Xcode project without signing
       - name: Build Xcode project without signing
         run: |
           cd "$GITHUB_WORKSPACE/ios"
@@ -91,13 +97,17 @@ jobs:
             exit 1
           fi
 
+      # Step 12: Locate the built .app bundle
       - name: Debug build settings and locate .app bundle
         run: |
           cd "$GITHUB_WORKSPACE/ios"
           BUILD_SETTINGS=$(xcodebuild -project "${{ env.XCODEPROJ_PATH }}" -scheme "${{ env.SCHEME_NAME }}" -configuration Release -sdk iphoneos -showBuildSettings)
-          echo "$BUILD_SETTINGS"
           BUILT_PRODUCTS_DIR=$(echo "$BUILD_SETTINGS" | grep -E '^\s*BUILT_PRODUCTS_DIR' | cut -d '=' -f2 | xargs)
           FULL_PRODUCT_NAME=$(echo "$BUILD_SETTINGS" | grep -E '^\s*FULL_PRODUCT_NAME' | cut -d '=' -f2 | xargs)
+          if [ -z "$BUILT_PRODUCTS_DIR" ] || [ -z "$FULL_PRODUCT_NAME" ]; then
+            echo "Error: Failed to parse build settings"
+            exit 1
+          fi
           APP_PATH="$BUILT_PRODUCTS_DIR/$FULL_PRODUCT_NAME"
           echo "APP_PATH=$APP_PATH" >> $GITHUB_ENV
           if [ -d "$APP_PATH" ]; then
@@ -108,26 +118,55 @@ jobs:
             exit 1
           fi
 
+      # Step 13: Create the IPA file
       - name: Create IPA from unsigned app bundle
         run: |
-          IPA_NAME="Cockham Superheros.ipa"
+          echo "IPA_NAME=Cockham Superheros.ipa" >> $GITHUB_ENV
           mkdir -p "$GITHUB_WORKSPACE/temp/Payload"
           cp -R "${{ env.APP_PATH }}" "$GITHUB_WORKSPACE/temp/Payload/"
+          echo "Contents of Payload:"
+          ls -la "$GITHUB_WORKSPACE/temp/Payload"
           cd "$GITHUB_WORKSPACE/temp"
-          zip -r "$IPA_NAME" Payload/
-          echo "IPA_PATH=$GITHUB_WORKSPACE/temp/$IPA_NAME" >> $GITHUB_ENV
+          zip -r "${{ env.IPA_NAME }}" Payload/ 2>&1 | tee zip.log
+          if [ $? -ne 0 ]; then
+            echo "Error: zip command failed"
+            cat zip.log
+            exit 1
+          fi
+          if [ ! -f "${{ env.IPA_NAME }}" ]; then
+            echo "Error: IPA file not found"
+            exit 1
+          fi
+          echo "IPA file size: $(du -sh ${{ env.IPA_NAME }})"
 
-      - name: Split IPA into smaller chunks
+      # Step 14: Split the IPA file using 7zip
+      - name: Split IPA using 7zip
         run: |
           cd "$GITHUB_WORKSPACE/temp"
-          split -b 1G "$IPA_NAME" "Cockham_Superheros_part_"
-          echo "SPLIT_FILES=$(ls Cockham_Superheros_part_*)" >> $GITHUB_ENV
+          echo "Current directory: $(pwd)"
+          echo "Files in directory:"
+          ls -la
+          if [ ! -f "${{ env.IPA_NAME }}" ]; then
+            echo "Error: IPA file not found in $(pwd)"
+            exit 1
+          fi
+          7z a -v1g "${{ env.IPA_NAME }}.7z" "${{ env.IPA_NAME }}"
+          echo "Split files created:"
+          ls "${{ env.IPA_NAME }}.7z.*"
 
+      # Step 15: Create a GitHub release and upload split assets
       - name: Create release and upload split assets
         env:
           GITHUB_TOKEN: ${{ secrets.GITEATOKEN }}
           GH_TOKEN: ${{ secrets.GITEATOKEN }}
         run: |
-          gh release create "${{ github.ref_name }}" $(echo "${{ env.SPLIT_FILES }}" | tr '\n' ' ') \
+          cd "$GITHUB_WORKSPACE/temp"
+          gh release create "${{ github.ref_name }}" "${{ env.IPA_NAME }}.7z.*" \
             --title "Release ${{ github.ref_name }}" \
-            --notes "Automated release. To reassemble the IPA, use: cat Cockham_Superheros_part_* > Cockham_Superheros.ipa"
+            --notes "Automated release. To extract the IPA, download all the parts (e.g., ${{ env.IPA_NAME }}.7z.001, etc.) to the same directory, then run:
+
+            ```bash
+            7z x \"${{ env.IPA_NAME }}.7z.001\"
+            ```
+
+            This will extract the IPA file. Ensure you have 7zip installed on your system."
